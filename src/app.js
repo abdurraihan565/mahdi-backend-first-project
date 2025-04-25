@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const path = require("path");
 const bodyParser = require("body-parser");
 const imageRouter = require("./routers/userRouter");
 
@@ -15,7 +16,11 @@ app.use(cors(
 ));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+// Serve entire public folder
 app.use(express.static("public"));
+
+// Serve images specifically from /images
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.use('/api', imageRouter);
 
