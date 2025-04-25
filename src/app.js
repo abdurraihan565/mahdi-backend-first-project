@@ -8,7 +8,7 @@ const imageRouter = require("./routers/userRouter");
 const app = express();
 app.use(morgan("dev"));
 app.use(cors(
-  {
+ {
     origin: 'https://99polygon.com',
     credentials: true,
   }
@@ -21,7 +21,7 @@ app.use('/api', imageRouter);
 
 app.get("/test", (req, res) => {
   res.status(200).send({
-    message: "api testing is working good",
+    message: "api testing is properly working good",
   });
 });
 
