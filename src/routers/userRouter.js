@@ -1,12 +1,12 @@
 const express = require('express');
-const { getImages, getImagesData, getPortpolioImages, getPortfolioData, getAboutPost, getAboutTeamData, getAboutClientPost, getAboutClientData, getAboutContibutiontPost, getAboutContibutionData, getBlogPost, getBlogData } = require('../controllers/ImageControllers');
-//const { uploadImage, PortfolioImage, AboutTeamImage, AboutClientImage, AboutContibutionImage, BlogImage } = require('../midelwares/uploadFile');
-const { uploadImage, PortfolioImage, AboutTeamImage, AboutClientImage, AboutContibutionImage, BlogImage } = require('../midlewares/upload');
+const { getPortpolioImages, getImages, getImagesData, getPortfolioData, getAboutPost, getAboutTeamData, getAboutClientPost, getAboutClientData, getAboutContibutiontPost, getAboutContibutionData, getBlogPost, getBlogData } = require('../controllers/ImageControllers');
+const { memoryUpload } = require('../midlewares/upload');
 
 const imageRouter = express.Router();
 
+
 imageRouter.post(
-  '/images',uploadImage.array('url',),
+  '/images',memoryUpload.array('url',),
   getImages
 );
 
@@ -15,10 +15,10 @@ imageRouter.get(
   '/images/data',
   getImagesData
 );
-
-//portfolio-
+// Portfolio Image Upload Route
 imageRouter.post(
-  '/portfolio',PortfolioImage.array('url',),
+  '/portfolio',
+  memoryUpload.array('url',),
   getPortpolioImages
 );
 //find portfolio data route
@@ -29,7 +29,7 @@ imageRouter.get(
 
 //about -team-
 imageRouter.post(
-  '/about/team',AboutTeamImage.single('url',),
+  '/about/team',memoryUpload.single('url',),
   getAboutPost
 );
 imageRouter.get(
@@ -39,7 +39,7 @@ imageRouter.get(
 
 //about client-post
 imageRouter.post(
-  '/about-client',AboutClientImage.array('url',),
+  '/about-client',memoryUpload.array('url',),
   getAboutClientPost
 );
 //about client get
@@ -50,7 +50,7 @@ imageRouter.get(
 
 //about contibution-post
 imageRouter.post(
-  '/about-contibution',AboutContibutionImage.array('url',),
+  '/about-contibution',memoryUpload.array('url',),
   getAboutContibutiontPost
 );
 //about contibution get
@@ -61,7 +61,7 @@ imageRouter.get(
 
 // blog post
 imageRouter.post(
-  '/blog',BlogImage.single('url',),
+  '/blog',memoryUpload.single('url',),
   getBlogPost
 );
 //get blog

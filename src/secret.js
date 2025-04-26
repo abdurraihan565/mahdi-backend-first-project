@@ -2,20 +2,15 @@ require('dotenv').config();
 const serverPort = process.env.SERVER_PORT || 3003;
 const MongodbURL = process.env.MONGODB_ATLAS_URL || 'mongodb://localhost:27017/mahdi';
 const clintURL = process.env.CLINT_URL || '';
-const SlideImages = process.env.UPLOAD_FILE_IMAGES||"public/images/photo";
-const PortfolioImages = process.env.UPLOAD_FILE_IMAGES_PORTFOLIO||"public/images/portfolio";
-const TeamImage = process.env.UPLOAD_FILE_IMAGES_TEAM||"public/images/team";
-const ClientImage = process.env.UPLOAD_FILE_IMAGES_CLIENT||"public/images/client";
-const ContibutionImage = process.env.UPLOAD_FILE_IMAGES_CONTIBUTION||"public/images/contibution";
-const BlogImageDir = process.env.UPLOAD_FILE_IMAGES_BLOG||"public/images/blog";
+const CloudinaryName = process.env.CLOUDINARY_CLOUD_NAME || 'dnp4ggqrz';
+const CloudinaryApiKey = process.env.CLOUDINARY_API_KEY || '333587322729368';
+const CloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET || 'zcYHERfn5BYYppGYEfv8gIP9Pas';
+
 module.exports = {
     serverPort,
     MongodbURL,
     clintURL,
-    SlideImages,
-    PortfolioImages,
-    TeamImage,
-    ClientImage ,
-    ContibutionImage,
-    BlogImageDir
+    CloudinaryName,
+    CloudinaryApiKey,
+    CloudinaryApiSecret,
   };

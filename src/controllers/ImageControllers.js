@@ -1,3 +1,5 @@
+
+const { uploadToCloudinary } = require("../midlewares/upload");
 const Clients = require("../Models/aboutClientModel");
 const Contibutions = require("../Models/aboutContibutionModel");
 const AboutsTeam = require("../Models/aboutTeamModel");
@@ -5,13 +7,51 @@ const Blog = require("../Models/blogModel");
 const Portfolio = require("../Models/portfolioModel");
 const Images = require("../Models/slideModel");
 
+// Upload portfolio images
+const getPortpolioImages = async (req, res) => {
+  try {
+    const { title, categories, buttonText } = req.body;
+    const files = req.files;
+
+    const uploadedUrls = await Promise.all(files.map(async (file) => {
+      // Set folder name based on the image type (Portfolio)
+      const folderName = "portfolio";
+      return await uploadToCloudinary(file, folderName);
+    }));
+
+    const portfolioData = new Portfolio({
+      title,
+      url: uploadedUrls,
+      categories,
+      buttonText,
+    });
+    const saved = await portfolioData.save();
+
+    res.status(201).json({
+      message: 'Portfolio uploaded successfully!',
+      slide: saved,
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: 'Portfolio upload failed!',
+      error: err.message,
+    });
+  }
+};
+
+
+
 //post slide data
 const  getImages = async (req, res, next) => {
     try {
         const { title, categories, buttonText } = req.body;
-        const url = req.files.map(file => `/images/photo/${file.filename}`);
-    
-        const images = new Images({ title, url, categories, buttonText });
+        const files = req.files;
+        const uploadedUrls = await Promise.all(files.map(async (file) => {
+          const folderName = "photo";
+          return await uploadToCloudinary(file, folderName);
+        }));
+      
+        const images = new Images({ title, url:uploadedUrls, categories, buttonText });
         const saved = await  images.save();
     
         res.status(201).json({
@@ -26,6 +66,7 @@ const  getImages = async (req, res, next) => {
       }
   
   }
+  
 //get slide data
 const getImagesData = async (req, res, next) => {
     try {
@@ -43,28 +84,7 @@ const getImagesData = async (req, res, next) => {
   
   }
 
-//portfolio
-//post postfolio
-const  getPortpolioImages = async (req, res, next) => {
-    try {
-        const { title, categories, buttonText } = req.body;
-        const url = req.files.map(file => `/images/portfolio/${file.filename}`);
-    
-        const portfolioData = new Portfolio({ title, url, categories, buttonText });
-        const saved = await  portfolioData.save();
-    
-        res.status(201).json({
-          message: 'Portfolio  uploaded successfully!',
-          slide: saved
-        });
-      } catch (err) {
-        res.status(400).json({
-          message: 'Slide upload failed!',
-          error: err.message
-        });
-      }
-  
-  }
+
 //get slide data
 const getPortfolioData = async (req, res, next) => {
     try {
@@ -81,27 +101,36 @@ const getPortfolioData = async (req, res, next) => {
       }
   
   }
-  // team
+// team
   //post 
-const  getAboutPost = async (req, res, next) => {
+  const getAboutPost = async (req, res, next) => {
     try {
-        const { name, role } = req.body;
-        const url = `/images/team/${req.file.filename}`;
-        const AboutTeamData = new AboutsTeam({ name,role, url });
-        const saved = await  AboutTeamData.save();
-    
-        res.status(201).json({
-          message: 'Team data  uploaded successfully!',
-          slide: saved
-        });
-      } catch (err) {
-        res.status(400).json({
-          message: ' upload failed! Try Again !',
-          error: err.message
-        });
-      }
+      const { name, role } = req.body;
+      const file = req.file;
   
-  }
+      // Cloudinary folder name
+      const folderName = "team";
+  
+      // Upload to Cloudinary
+      const uploadedUrl = await uploadToCloudinary(file, folderName);
+  
+      const AboutTeamData = new AboutsTeam({ name, role, url: uploadedUrl });
+      const saved = await AboutTeamData.save();
+  
+      res.status(201).json({
+        message: 'Team data uploaded successfully!',
+        data: saved,
+      });
+    } catch (err) {
+      res.status(400).json({
+        message: 'Upload failed! Try Again!',
+        error: err.message,
+      });
+    }
+  };
+
+  
+ 
 //get 
 const getAboutTeamData = async (req, res, next) => {
     try {
@@ -118,26 +147,33 @@ const getAboutTeamData = async (req, res, next) => {
       }
   
   }
- // client
+// client
   //post 
 const getAboutClientPost = async (req, res, next) => {
     try {
-        const url = req.files.map(file => `/images/client/${file.filename}`);
-        const AboutClientData = new Clients({url });
-        const saved = await  AboutClientData.save();
-    
-        res.status(201).json({
-          message: 'Client data  uploaded successfully!',
-          AboutClientData: saved
-        });
-      } catch (err) {
-        res.status(400).json({
-          message: ' upload failed! Try Again !',
-          error: err.message
-        });
-      }
+      const files = req.files;
   
-  }
+      // upload to image Cloudinary 
+      const uploadedUrls = await Promise.all(files.map(async (file) => {
+        const folderName = "client"; // cloudinary folder
+        return await uploadToCloudinary(file, folderName);
+      }));
+  
+      const AboutClientData = new Clients({ url: uploadedUrls });
+      const saved = await AboutClientData.save();
+  
+      res.status(201).json({
+        message: 'Client data uploaded successfully!',
+        AboutClientData: saved
+      });
+    } catch (err) {
+      res.status(400).json({
+        message: 'Upload failed! Try Again!',
+        error: err.message
+      });
+    }
+  };
+ 
 //get 
 const getAboutClientData = async (req, res, next) => {
     try {
@@ -157,24 +193,30 @@ const getAboutClientData = async (req, res, next) => {
 
 // Contibution
   //post 
-const getAboutContibutiontPost = async (req, res, next) => {
+  const getAboutContibutiontPost = async (req, res, next) => {
     try {
-        const url = req.files.map(file => `/images/contibution/${file.filename}`);
-        const AboutContibutionData = new Contibutions({url });
-        const saved = await AboutContibutionData.save();
-    
-        res.status(201).json({
-          message: ' data  uploaded successfully!',
-          AboutContibutionData: saved
-        });
-      } catch (err) {
-        res.status(400).json({
-          message: ' upload failed! Try Again !',
-          error: err.message
-        });
-      }
+      const files = req.files;
   
-  }
+      // Cloudinary to upload
+      const uploadedUrls = await Promise.all(
+        files.map(file => uploadToCloudinary(file, "contibution"))
+      );
+  
+      const AboutContibutionData = new Contibutions({ url: uploadedUrls });
+      const saved = await AboutContibutionData.save();
+  
+      res.status(201).json({
+        message: 'Data uploaded successfully!',
+        AboutContibutionData: saved
+      });
+    } catch (err) {
+      res.status(400).json({
+        message: 'Upload failed! Try Again!',
+        error: err.message
+      });
+    }
+  };
+ 
 //get 
 const  getAboutContibutionData = async (req, res, next) => {
     try {
@@ -192,27 +234,30 @@ const  getAboutContibutionData = async (req, res, next) => {
   
   }
 
-  // Blog
+// Blog
   //post 
 const getBlogPost = async (req, res, next) => {
-    try {
-        const { name, role } = req.body;
-        const url = `/images/blog/${req.file.filename}`;
-        const BlogData = new Blog({name,role,url });
-        const saved = await BlogData.save();
-    
-        res.status(201).json({
-          message: ' data  uploaded successfully!',
-          BlogData: saved
-        });
-      } catch (err) {
-        res.status(400).json({
-          message: ' upload failed! Try Again !',
-          error: err.message
-        });
-      }
-  
+  try {
+    const { name, role } = req.body;
+    const file = req.file;
+
+    const uploadedUrl = await uploadToCloudinary(file, "blog");
+
+    const BlogData = new Blog({ name, role, url: uploadedUrl });
+    const saved = await BlogData.save();
+
+    res.status(201).json({
+      message: 'Data uploaded successfully!',
+      BlogData: saved
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: 'Upload failed! Try Again!',
+      error: err.message
+    });
   }
+};
+ 
 //get 
 const  getBlogData = async (req, res, next) => {
     try {
