@@ -60,8 +60,20 @@ imageRouter.get(
 );
 
 // blog post
+/*
 imageRouter.post(
   '/blog',memoryUpload.single('url',),
+  getBlogPost
+);*/
+imageRouter.post(
+  '/blog',memoryUpload.fields([
+    { name: 'img1', maxCount: 1 },
+    { name: 'img2', maxCount: 1 },
+    { name: 'img3', maxCount: 1 },
+    { name: 'img4', maxCount: 1 },
+    { name: 'img5', maxCount: 1 },
+    { name: 'img6', maxCount: 1 },
+  ]),
   getBlogPost
 );
 //get blog

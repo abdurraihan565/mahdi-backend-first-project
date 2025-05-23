@@ -237,6 +237,44 @@ const  getAboutContibutionData = async (req, res, next) => {
 // Blog
   //post 
 const getBlogPost = async (req, res, next) => {
+   try {
+    const { title, content } = req.body;
+
+    // Parse JSON if frontend is sending it as string
+    const parsedContent = JSON.parse(content);
+
+    const finalContent = [];
+
+    for (const item of parsedContent) {
+      if (item.type === 'image' && item.fileKey) {
+        // Uploaded file from multer middleware (file.fieldname = item.fileKey)
+        const file = req.files[item.fileKey]?.[0];
+        if (!file) continue;
+        const uploadedUrl = await uploadToCloudinary(file, 'blog');
+        finalContent.push({ type: 'image', value: uploadedUrl });
+      } else if (item.type === 'text') {
+        finalContent.push({ type: 'text', value: item.value });
+      }
+    }
+
+    const  BlogData = new Blog({
+      title,
+      content: finalContent
+    });
+
+    const saved = await  BlogData.save();
+
+    res.status(201).json({
+      message: 'Blog created successfully!',
+      BlogData: saved
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: 'Blog creation failed!',
+      error: err.message
+    });
+  }
+  /*
   try {
     const { name, role } = req.body;
     const file = req.file;
@@ -255,11 +293,13 @@ const getBlogPost = async (req, res, next) => {
       message: 'Upload failed! Try Again!',
       error: err.message
     });
-  }
+  }*/
 };
  
 //get 
 const  getBlogData = async (req, res, next) => {
+   
+  
     try {
         const BlogData = await Blog.find();
         res.status(200).json({
